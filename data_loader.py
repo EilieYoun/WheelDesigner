@@ -1,8 +1,8 @@
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-from data_utils import *
-from models import Encoder, Decoder
+from WheelDesigner.data_utils import *
+from WheelDesigner.models import Encoder, Decoder
 
 class WheelPreprocessV01(Dataset):
   def __init__(self, x_paths, y_labels,
