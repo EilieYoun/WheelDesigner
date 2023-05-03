@@ -1,7 +1,7 @@
 import numpy as np 
 import torch 
 from torch.nn import functional as F
-from data_utils import rotate
+from WheelDesigner.data_utils import rotate
 
 def get_rec_loss(x, x_hat, divide=None):
     loss = F.binary_cross_entropy(x_hat, x, reduction='sum')
