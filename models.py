@@ -1,4 +1,4 @@
-from modules import *
+from WheelDesigner.modules import *
 
 class Encoder(nn.Sequential):
     def __init__(self, img_channel, noise_channel):
@@ -84,13 +84,13 @@ class Decoder(nn.Sequential):
             x = module(x)
         return x
 
-def get_model(img_dims, noise_dims, load_encoder=None, load_decoder=None):
-    encoder = Encoder(img_dims, noise_dims)
-    decoder = Decoder(noise_dims)
+def get_model(img_dims, noise_dims, device, load_encoder=None, load_decoder=None):
+    encoder = Encoder(img_dims, noise_dims).to(device)
+    decoder = Decoder(noise_dims).to(device)
     
     if load_encoder is not None:
-        encoder.load_state_dict(torch.load(load_encoder))
+        encoder.load_state_dict(torch.load(load_encoder, map_location=torch.device(device)))
     if load_decoder is not None:
-        decoder.load_state_dict(torch.load(load_decoder))
+        decoder.load_state_dict(torch.load(load_decoder, map_location=torch.device(device)))
 
     return encoder, decoder
