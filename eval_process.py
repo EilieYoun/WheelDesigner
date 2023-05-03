@@ -1,14 +1,7 @@
-import torch
-from WheelDesigner.data_utils import *
-from WheelDesigner.models import *
-import numpy as np
-import pickle
-
-
 class WheelEvalProcess():
     def __init__(self, 
+                path,
                 encoder_path, 
-                decoder_path, 
                 umap_path, 
                 cand_path,
                 cand_piece,
@@ -16,17 +9,14 @@ class WheelEvalProcess():
                 device='cpu'
                 ):
        
+        self.path = path
         self.img_shape = (3, 128, 128)
         self.noise_shape = (4,16,16)
         self.img_size=self.img_shape[-1]
-        self.encoder, self.decoder = get_model(self.img_shape[0], self.noise_shape[0], encoder_path, decoder_path)
+        self.encoder, _ = get_model(self.img_shape[0], self.noise_shape[0], device, encoder_path)
+        self.encoder.eval()
       
         self.device=device
-        self.encoder.to(device)
-        self.decoder.to(device)
-        self.encoder.eval()
-        self.decoder.eval()
-        
         with open(umap_path, 'rb') as f:
             self.umap_model = pickle.load(f)
 
@@ -43,7 +33,7 @@ class WheelEvalProcess():
         x = tobinary(x)
         x = fill_hole(x, hole_ratio)
         x = remove_bkg(x, crop_ratio)
-        x = zoom_and_resize(x, resize=self.img_size)
+        x = zoom_and_resize(x, resize=self.img_size, crop_ratio=crop_ratio)
         return x 
             
     
@@ -86,7 +76,7 @@ class WheelEvalProcess():
         cand_filtered_emb  = self.cand_emb[piece_mask]
         emb_diff = list(map(lambda cand_emb: self.get_diff(cand_emb, x_emb), cand_filtered_emb))
         sorted_idx = sorted(range(len(emb_diff)), key=lambda i: (emb_diff[i]), reverse=False)
-        cand_sorted_path = [cand_filtered_path[idx] for idx in sorted_idx][:1000]
+        cand_sorted_path = [self.path+'/'+cand_filtered_path[idx] for idx in sorted_idx][:1000]
        
         cand_imgs = list(map(lambda x: self.path2process(x), cand_sorted_path))
         img_diff = list(map(lambda cand_img: self.get_diff(cand_img, x_img), cand_imgs))
