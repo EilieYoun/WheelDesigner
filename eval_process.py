@@ -1,6 +1,6 @@
 import torch
-from data_utils import *
-from models import *
+from WheelDesigner.data_utils import *
+from WheelDesigner.models import *
 import numpy as np
 import pickle
 
